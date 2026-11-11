@@ -52,3 +52,20 @@ export async function getProjectById(id: number): Promise<Project | null> {
     return null;
   }
 }
+
+
+export async function getProjects(type?: string | null): Promise<Project[]> {
+  try {
+    if (type) {
+      const { rows } = await sql<Project>`
+        SELECT * FROM projects WHERE type = ${type} ORDER BY id
+      `;
+      return rows;
+    }
+    const { rows } = await sql<Project>`SELECT * FROM projects ORDER BY id`;
+    return rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    return [];
+  }
+}

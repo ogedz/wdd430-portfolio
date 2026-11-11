@@ -1,9 +1,8 @@
 import { getProjects } from '@/lib/projects-db';
 
 export default async function OpenSourceProjects() {
-  // Fetching directly from the database logic (Server Component)
-  // You can also fetch from your API route: await fetch('http://localhost:3000/api/projects?type=opensource')
-  const projects = getProjects('opensource'); 
+
+  const projects = await getProjects('opensource');
 
   return (
     <div>
