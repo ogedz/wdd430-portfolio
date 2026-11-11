@@ -1,3 +1,7 @@
+'use cache';
+
+import { sql } from '@vercel/postgres';
+
 export interface Project {
   id: number;
   title: string;
@@ -7,29 +11,44 @@ export interface Project {
   link?: string;
 }
 
-export const projects: Project[] = [
-  {
-    id: 1,
-    title: 'My First Open Source Contribution',
-    description: 'A bug fix contributed to a popular library.',
-    type: 'opensource',
-    technologies: ['TypeScript', 'React'],
-    link: 'https://github.com/example/repo'
-  },
-  {
-    id: 2,
-    title: 'Database Design Final Project',
-    description: 'An ER diagram and normalized schema for a library system.',
-    type: 'school',
-    technologies: ['PostgreSQL', 'SQL']
-  }
-];
+const ITEMS_PER_PAGE = 6;
 
-export function getProjects(type?: string | null): Project[] {
-  if (type) return projects.filter(p => p.type === type);
-  return projects;
+export async function fetchFilteredProjects(query: string, currentPage: number): Promise<Project[]> {
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+  try {
+    const { rows } = await sql<Project>`
+      SELECT * FROM projects 
+      WHERE title ILIKE ${`%${query}%`} OR description ILIKE ${`%${query}%`}
+      ORDER BY id LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+    `;
+    return rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    return [];
+  }
 }
 
-export function getProjectById(id: number): Project | null {
-  return projects.find(p => p.id === id) ?? null;
+export async function fetchProjectsPages(query: string): Promise<number> {
+  try {
+    const { rows } = await sql`
+      SELECT COUNT(*) FROM projects 
+      WHERE title ILIKE ${`%${query}%`} OR description ILIKE ${`%${query}%`}
+    `;
+    return Math.ceil(Number(rows[0].count) / ITEMS_PER_PAGE);
+  } catch (error) {
+    console.error('Database Error:', error);
+    return 0;
+  }
+}
+
+export async function getProjectById(id: number): Promise<Project | null> {
+  try {
+    const { rows } = await sql<Project>`
+      SELECT * FROM projects WHERE id = ${id}
+    `;
+    return rows[0] ?? null;
+  } catch (error) {
+    console.error('Database Error:', error);
+    return null;
+  }
 }

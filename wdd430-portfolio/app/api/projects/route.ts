@@ -4,5 +4,6 @@ import { getProjects } from '@/lib/projects-db';
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const type = searchParams.get('type');
-  return NextResponse.json(getProjects(type));
+  const projects = await getProjects(type); // <-- Added await
+  return NextResponse.json(projects);
 }

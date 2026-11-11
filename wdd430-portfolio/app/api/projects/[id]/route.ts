@@ -12,7 +12,7 @@ export async function GET(
     return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
   }
 
-  const project = getProjectById(id);
+  const project = await getProjectById(id); // <-- Added await
 
   if (!project) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
