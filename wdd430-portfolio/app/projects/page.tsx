@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import { connection } from 'next/server';
+import Link from 'next/link'; // <-- Added Link import
 import ProjectSearch from '@/components/ProjectSearch';
 import ProjectList from '@/components/ProjectList';
 import { fetchFilteredProjects } from '@/lib/projects-db';
@@ -29,7 +30,17 @@ export default function ProjectsPage(props: {
 }) {
   return (
     <main className="container mx-auto px-4 py-8 text-gray-900">
-      <h1 className="text-3xl font-bold mb-6 text-white">Projects</h1>
+      
+      {/* Changed this section to include the flexbox and the button */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <h1 className="text-3xl font-bold text-white">Projects</h1>
+        <Link 
+          href="/projects/create" 
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-semibold transition-colors shadow-md"
+        >
+          + Create Project
+        </Link>
+      </div>
       
       <ProjectSearch />
       
@@ -38,4 +49,4 @@ export default function ProjectsPage(props: {
       </Suspense>
     </main>
   );
-}  
+}
